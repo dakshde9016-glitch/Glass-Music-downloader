@@ -23,11 +23,15 @@ android {
         }
 
         python {
-            version "3.11"
+            python {
+            buildPython "C:/Users/piyus/AppData/Local/Programs/Python/Python310/python.exe"
+            
+            version "3.8"
             pip {
                 install "yt-dlp"
                 install "spotipy"
             }
+        }
         }
     }
 
@@ -74,6 +78,10 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1'
     implementation 'org.json:json:20240303'
+
+    // Media3 / ExoPlayer for local music playback
+    implementation 'androidx.media3:media3-exoplayer:1.4.1'
+    implementation 'androidx.media3:media3-common:1.4.1'
 
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'

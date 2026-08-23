@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -27,8 +28,8 @@ fun SpotifyExtractorTab(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
-    val spotifyUrl by viewModel.spotifyUrlInput.collectAsState()
-    val extractionState by viewModel.spotifyState.collectAsState()
+    val spotifyUrl by viewModel.spotifyUrlInput.collectAsStateWithLifecycle()
+    val extractionState by viewModel.spotifyState.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = modifier
