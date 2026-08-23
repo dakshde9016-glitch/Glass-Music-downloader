@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -31,11 +30,11 @@ fun DirectDownloadTab(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
-    val queryInput by viewModel.queryInput.collectAsStateWithLifecycle()
-    val songChips by viewModel.songChips.collectAsStateWithLifecycle()
-    val selectedQuality by viewModel.selectedQuality.collectAsStateWithLifecycle()
-    val downloadState by viewModel.downloadState.collectAsStateWithLifecycle()
-    val isDownloading by viewModel.isDownloading.collectAsStateWithLifecycle()
+    val queryInput by viewModel.queryInput.collectAsState()
+    val songChips by viewModel.songChips.collectAsState()
+    val selectedQuality by viewModel.selectedQuality.collectAsState()
+    val downloadState by viewModel.downloadState.collectAsState()
+    val isDownloading by viewModel.isDownloading.collectAsState()
 
     LazyColumn(
         modifier = modifier

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,12 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.audiodownloader.ui.components.GlassBackground
 import com.example.audiodownloader.ui.tabs.DirectDownloadTab
-import com.example.audiodownloader.ui.tabs.LocalPlayerTab
 import com.example.audiodownloader.ui.tabs.SpotifyExtractorTab
-import com.example.audiodownloader.ui.viewmodel.LocalPlayerViewModel
 import com.example.audiodownloader.ui.viewmodel.MainViewModel
 import java.io.File
 import java.io.PrintWriter
@@ -48,30 +45,20 @@ import java.io.StringWriter
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
-    private val localPlayerViewModel: LocalPlayerViewModel by viewModels()
-
-    private var hasAudioPermission by mutableStateOf(false)
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { _ ->
-        hasAudioPermission = hasAudioPermissionGranted()
-    }
+    ) { _ -> }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         try {
-            hasAudioPermission = hasAudioPermissionGranted()
             checkAndRequestPermissions()
 
             setContent {
                 AudioDownloaderTheme {
-                    MainAppScreen(
-                        viewModel = viewModel,
-                        localPlayerViewModel = localPlayerViewModel,
-                        hasAudioPermission = hasAudioPermission
-                    )
+                    MainAppScreen(viewModel = viewModel)
                 }
             }
         } catch (t: Throwable) {
@@ -80,8 +67,8 @@ class MainActivity : ComponentActivity() {
             val errorText = "Startup Crash Encountered:\n\n$sw"
 
             try {
-                val crashFile = File(getExternalFilesDir(null), "app_crash.txt")
-                crashFile.writeText(errorText)
+                val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                File(downloadDir, "app_crash.txt").writeText(errorText)
             } catch (_: Exception) {}
 
             // Display native emergency fallback text screen
@@ -99,12 +86,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Re-check in case the user granted the audio permission from system Settings.
-        hasAudioPermission = hasAudioPermissionGranted()
-    }
-
     private fun checkAndRequestPermissions() {
         val permissions = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -115,9 +96,6 @@ class MainActivity : ComponentActivity() {
                 permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
             }
         } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
@@ -127,24 +105,11 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(permissions.toTypedArray())
         }
     }
-
-    private fun hasAudioPermissionGranted(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
-        } else {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-        }
-    }
 }
 
 @Composable
-fun MainAppScreen(
-    viewModel: MainViewModel,
-    localPlayerViewModel: LocalPlayerViewModel,
-    hasAudioPermission: Boolean
-) {
-    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
+fun MainAppScreen(viewModel: MainViewModel) {
+    val selectedTab by viewModel.selectedTab.collectAsState()
 
     GlassBackground {
         Scaffold(
@@ -172,10 +137,6 @@ fun MainAppScreen(
                     when (tab) {
                         0 -> DirectDownloadTab(viewModel = viewModel)
                         1 -> SpotifyExtractorTab(viewModel = viewModel)
-                        2 -> LocalPlayerTab(
-                            viewModel = localPlayerViewModel,
-                            hasPermission = hasAudioPermission
-                        )
                     }
                 }
             }
@@ -238,13 +199,6 @@ fun GlassBottomNavigationBar(
                 icon = Icons.Default.LibraryMusic,
                 isSelected = selectedTab == 1,
                 onClick = { onTabSelected(1) },
-                modifier = Modifier.weight(1f)
-            )
-            GlassNavigationItem(
-                label = "Local Player",
-                icon = Icons.Default.GraphicEq,
-                isSelected = selectedTab == 2,
-                onClick = { onTabSelected(2) },
                 modifier = Modifier.weight(1f)
             )
         }
