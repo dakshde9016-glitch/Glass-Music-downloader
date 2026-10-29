@@ -17,7 +17,7 @@ A native Android music engine with an edge-to-edge glassmorphic design. Built wi
 * **Effortless Direct Downloads:** Simply type or paste the names of the songs you want—no links or complex queries needed. The app matches the titles and downloads them directly to your storage. For multiple song downloads at once put commas(,) between song names. example: shape of you, Perfect, blinding lights
 
 ⭐ **One-Click Spotify Playlist Extractor:** Paste any public Spotify playlist URL to parse and queue every single track automatically into the downloader engine with a single tap.
-* **Native Audio Processing:** Directly extracts high-quality audio streams without heavy external server dependencies. Also the app performs automatic lossless mp3 conversion so even your grandpa's car system can play your high quality music.
+* **Native Audio Processing:** Directly extracts high-quality audio streams without heavy external server dependencies. Also the app performs automatic lossless mp3 conversion so even your grandpa's legacy car system can play your high quality playlist.
 * **Automatic Media Indexing:** Downloaded files are scanned straight into your device’s MediaStore so they appear in your favorite music player instantly.
 * **Modern Glassmorphic UI:** Smooth Compose animations, customizable audio bitrate presets, dynamic progress tracking, and batch download queues.
 
